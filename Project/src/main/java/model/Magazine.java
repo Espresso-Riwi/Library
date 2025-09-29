@@ -1,19 +1,26 @@
 
 public class Magazine extends Item {
     private int issueNumber;
-    private String publicationMonth;
+    private String topic;
 
-    public Magazine(int id, String title, String author, boolean available, int issueNumber, String publicationMonth) {
+    public Magazine(int id, String title, String author, boolean available, int issueNumber, String topic) {
         super(id, title, author, available, "MAGAZINE");
-        this.issueNumber = issueNumber;
-        this.publicationMonth = publicationMonth;
+        setIssueNumber(issueNumber);
+        setTopic(topic);
+
     }
 
     public int getIssueNumber() { return issueNumber; }
-    public String getPublicationMonth() { return publicationMonth; }
+
+    public String getTopic() {
+        return topic;
+    }
 
     public void setIssueNumber(int issueNumber) { this.issueNumber = issueNumber; }
-    public void setPublicationMonth(String publicationMonth) { this.publicationMonth = publicationMonth; }
+
+    public void setTopic(String topic) {
+        this.topic = topic;
+    }
 
     @Override
     public String toString() {
@@ -24,7 +31,6 @@ public class Magazine extends Item {
                 ", available=" + available +
                 ", type='" + type + '\'' +
                 ", issueNumber=" + issueNumber +
-                ", publicationMonth='" + publicationMonth + '\'' +
                 '}';
     }
 }

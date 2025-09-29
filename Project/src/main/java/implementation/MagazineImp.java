@@ -7,7 +7,7 @@ public class MagazineImp implements MagazineDAO {
     @Override
     public void addMagazine(Magazine magazine) {
         String sqlItem = "INSERT INTO item (id, title, author, available, type) VALUES (?, ?, ?, ?, ?, ?)";
-        String sqlMagazine = "INSERT INTO magazine (id, issueNumber, publicationMonth) VALUES (?, ?, ?)";
+        String sqlMagazine = "INSERT INTO magazine (id, issueNumber, topic) VALUES (?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -24,7 +24,7 @@ public class MagazineImp implements MagazineDAO {
 
                 stmtMagazine.setInt(1, magazine.getId());
                 stmtMagazine.setInt(2, magazine.getIssueNumber());
-                stmtMagazine.setString(3, magazine.getPublicationMonth());
+                stmtMagazine.setString(3, magazine.getTopic());
                 stmtMagazine.executeUpdate();
 
                 conn.commit();
@@ -39,7 +39,7 @@ public class MagazineImp implements MagazineDAO {
 
     @Override
     public Magazine getMagazineById(int id) {
-        String sql = "SELECT i.id, i.title, i.author, i.year, i.available, m.issueNumber, m.publicationMonth " +
+        String sql = "SELECT i.id, i.title, i.author, i.year, i.available, m.issueNumber, m.topic " +
                 "FROM item i JOIN magazine m ON i.id = m.id WHERE i.id = ? AND i.type = 'MAGAZINE'";
 
         try (Connection conn = DBConnection.getConnection();
@@ -55,7 +55,7 @@ public class MagazineImp implements MagazineDAO {
                         rs.getString("author"),
                         rs.getBoolean("available"),
                         rs.getInt("issueNumber"),
-                        rs.getString("publicationMonth")
+                        rs.getString("topic")
                 );
             }
         } catch (SQLException e) {
@@ -67,7 +67,7 @@ public class MagazineImp implements MagazineDAO {
     @Override
     public List<Magazine> getAllMagazines() {
         List<Magazine> magazines = new ArrayList<>();
-        String sql = "SELECT i.id, i.title, i.author, i.available, m.issueNumber, m.publicationMonth " +
+        String sql = "SELECT i.id, i.title, i.author, i.available, m.issueNumber, m.topic " +
                 "FROM item i JOIN magazine m ON i.id = m.id WHERE i.type = 'MAGAZINE'";
 
         try (Connection conn = DBConnection.getConnection();
@@ -81,7 +81,7 @@ public class MagazineImp implements MagazineDAO {
                         rs.getString("author"),
                         rs.getBoolean("available"),
                         rs.getInt("issueNumber"),
-                        rs.getString("publicationMonth")
+                        rs.getString("topic")
                 ));
             }
         } catch (SQLException e) {
@@ -93,7 +93,7 @@ public class MagazineImp implements MagazineDAO {
     @Override
     public void updateMagazine(Magazine magazine) {
         String sqlItem = "UPDATE item SET title = ?, author = ?, available = ?, type = ? WHERE id = ?";
-        String sqlMagazine = "UPDATE magazine SET issueNumber = ?, publicationMonth = ? WHERE id = ?";
+        String sqlMagazine = "UPDATE magazine SET issueNumber = ?, topic = ? WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -109,7 +109,7 @@ public class MagazineImp implements MagazineDAO {
                 stmtItem.executeUpdate();
 
                 stmtMagazine.setInt(1, magazine.getIssueNumber());
-                stmtMagazine.setString(2, magazine.getPublicationMonth());
+                stmtMagazine.setString(2, magazine.getTopic());
                 stmtMagazine.setInt(3, magazine.getId());
                 stmtMagazine.executeUpdate();
 

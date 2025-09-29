@@ -7,7 +7,7 @@ public class BookImp implements BookDAO {
     @Override
     public void addBook(Book book) {
         String sqlItem = "INSERT INTO item (id, title, author, available, type) VALUES (?, ?, ?, ?, ?)";
-        String sqlBook = "INSERT INTO book (id, isbn, publisher) VALUES (?, ?, ?)";
+        String sqlBook = "INSERT INTO book (id, isbn, editorial) VALUES (?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -24,7 +24,7 @@ public class BookImp implements BookDAO {
 
                 stmtBook.setInt(1, book.getId());
                 stmtBook.setString(2, book.getIsbn());
-                stmtBook.setString(3, book.getPublisher());
+                stmtBook.setString(3, book.getEditorial());
                 stmtBook.executeUpdate();
 
                 conn.commit();
@@ -39,7 +39,7 @@ public class BookImp implements BookDAO {
 
     @Override
     public Book getBookById(int id) {
-        String sql = "SELECT i.id, i.title, i.author, i.available, b.isbn, b.publisher " +
+        String sql = "SELECT i.id, i.title, i.author, i.available, b.isbn, i.editorial" +
                 "FROM item i JOIN book b ON i.id = b.id WHERE i.id = ? AND i.type = 'BOOK'";
 
         try (Connection conn = DBConnection.getConnection();
@@ -55,7 +55,7 @@ public class BookImp implements BookDAO {
                         rs.getString("author"),
                         rs.getBoolean("available"),
                         rs.getString("isbn"),
-                        rs.getString("publisher")
+                        rs.getString("editorial")
                 );
             }
         } catch (SQLException e) {
@@ -67,7 +67,7 @@ public class BookImp implements BookDAO {
     @Override
     public List<Book> getAllBooks() {
         List<Book> books = new ArrayList<>();
-        String sql = "SELECT i.id, i.title, i.author, i.year, i.available, b.isbn, b.publisher " +
+        String sql = "SELECT i.id, i.title, i.author, i.available, b.isbn, i.editorial" +
                 "FROM item i JOIN book b ON i.id = b.id WHERE i.type = 'BOOK'";
 
         try (Connection conn = DBConnection.getConnection();
@@ -81,7 +81,7 @@ public class BookImp implements BookDAO {
                         rs.getString("author"),
                         rs.getBoolean("available"),
                         rs.getString("isbn"),
-                        rs.getString("publisher")
+                        rs.getString("editorial")
                 ));
             }
         } catch (SQLException e) {
@@ -93,7 +93,7 @@ public class BookImp implements BookDAO {
     @Override
     public void updateBook(Book book) {
         String sqlItem = "UPDATE item SET title = ?, author = ?, available = ?, type = ? WHERE id = ?";
-        String sqlBook = "UPDATE book SET isbn = ?, publisher = ? WHERE id = ?";
+        String sqlBook = "UPDATE book SET isbn = ?, SET editorial = ?, WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -109,7 +109,7 @@ public class BookImp implements BookDAO {
                 stmtItem.executeUpdate();
 
                 stmtBook.setString(1, book.getIsbn());
-                stmtBook.setString(2, book.getPublisher());
+                stmtBook.setString(1, book.getEditorial());
                 stmtBook.setInt(3, book.getId());
                 stmtBook.executeUpdate();
 
