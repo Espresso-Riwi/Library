@@ -9,12 +9,12 @@ public class Loan {
     private boolean returned;
 
     public Loan(int id, int userId, int itemId, LocalDate loanDate, LocalDate returnDate, boolean returned) {
-        this.id = id;
-        this.userId = userId;
-        this.itemId = itemId;
-        this.loanDate = loanDate;
-        this.returnDate = returnDate;
-        this.returned = returned;
+        setId(id);
+        setUserId(userId);
+        setItemId(itemId);
+        setLoanDate(loanDate);
+        setReturnDate(returnDate);
+        setReturned(returned);
     }
 
     // Getters & Setters

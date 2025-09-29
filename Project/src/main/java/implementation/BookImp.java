@@ -6,7 +6,7 @@ public class BookImp implements BookDAO {
 
     @Override
     public void addBook(Book book) {
-        String sqlItem = "INSERT INTO item (id, title, author, year, available, type) VALUES (?, ?, ?, ?, ?, ?)";
+        String sqlItem = "INSERT INTO item (id, title, author, available, type) VALUES (?, ?, ?, ?, ?)";
         String sqlBook = "INSERT INTO book (id, isbn, publisher) VALUES (?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection()) {
@@ -18,9 +18,8 @@ public class BookImp implements BookDAO {
                 stmtItem.setInt(1, book.getId());
                 stmtItem.setString(2, book.getTitle());
                 stmtItem.setString(3, book.getAuthor());
-                stmtItem.setInt(4, book.getYear());
-                stmtItem.setBoolean(5, book.isAvailable());
-                stmtItem.setString(6, "BOOK");
+                stmtItem.setBoolean(4, book.isAvailable());
+                stmtItem.setString(5, "BOOK");
                 stmtItem.executeUpdate();
 
                 stmtBook.setInt(1, book.getId());
@@ -40,7 +39,7 @@ public class BookImp implements BookDAO {
 
     @Override
     public Book getBookById(int id) {
-        String sql = "SELECT i.id, i.title, i.author, i.year, i.available, b.isbn, b.publisher " +
+        String sql = "SELECT i.id, i.title, i.author, i.available, b.isbn, b.publisher " +
                 "FROM item i JOIN book b ON i.id = b.id WHERE i.id = ? AND i.type = 'BOOK'";
 
         try (Connection conn = DBConnection.getConnection();
@@ -54,7 +53,6 @@ public class BookImp implements BookDAO {
                         rs.getInt("id"),
                         rs.getString("title"),
                         rs.getString("author"),
-                        rs.getInt("year"),
                         rs.getBoolean("available"),
                         rs.getString("isbn"),
                         rs.getString("publisher")
@@ -81,7 +79,6 @@ public class BookImp implements BookDAO {
                         rs.getInt("id"),
                         rs.getString("title"),
                         rs.getString("author"),
-                        rs.getInt("year"),
                         rs.getBoolean("available"),
                         rs.getString("isbn"),
                         rs.getString("publisher")
@@ -95,7 +92,7 @@ public class BookImp implements BookDAO {
 
     @Override
     public void updateBook(Book book) {
-        String sqlItem = "UPDATE item SET title = ?, author = ?, year = ?, available = ?, type = ? WHERE id = ?";
+        String sqlItem = "UPDATE item SET title = ?, author = ?, available = ?, type = ? WHERE id = ?";
         String sqlBook = "UPDATE book SET isbn = ?, publisher = ? WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection()) {
@@ -106,10 +103,9 @@ public class BookImp implements BookDAO {
 
                 stmtItem.setString(1, book.getTitle());
                 stmtItem.setString(2, book.getAuthor());
-                stmtItem.setInt(3, book.getYear());
-                stmtItem.setBoolean(4, book.isAvailable());
-                stmtItem.setString(5, "BOOK");
-                stmtItem.setInt(6, book.getId());
+                stmtItem.setBoolean(3, book.isAvailable());
+                stmtItem.setString(4, "BOOK");
+                stmtItem.setInt(5, book.getId());
                 stmtItem.executeUpdate();
 
                 stmtBook.setString(1, book.getIsbn());

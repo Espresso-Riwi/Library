@@ -2,10 +2,10 @@ public class Book extends Item {
     private String isbn;
     private String publisher;
 
-    public Book(int id, String title, String author, int year, boolean available, String isbn, String publisher) {
-        super(id, title, author, year, available, "BOOK");
-        this.isbn = isbn;
-        this.publisher = publisher;
+    public Book(int id, String title, String author, boolean available, String isbn, String publisher) {
+        super(id, title, author, available, "BOOK");
+        setIsbn(isbn);
+        setPublisher(publisher);
     }
 
     public String getIsbn() {
@@ -30,13 +30,10 @@ public class Book extends Item {
                 "id=" + id +
                 ", title='" + title + '\'' +
                 ", author='" + author + '\'' +
-                ", year=" + year +
                 ", available=" + available +
                 ", type='" + type + '\'' +
                 ", isbn='" + isbn + '\'' +
                 ", publisher='" + publisher + '\'' +
                 '}';
-
-
     }
 }
