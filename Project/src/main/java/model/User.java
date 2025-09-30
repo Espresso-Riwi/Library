@@ -3,21 +3,13 @@ public class User {
     private String dni;
     private String name;
     private String email;
-    private String password;
 
-    public User(String dni, String name, String email, String password) {
-        setName(name);
-        setEmail(email);
-        setDni(dni);
-        setPassword(password);
-    }
 
-    public User(int id, String dni, String name, String email, String password) {
+    public User(int id, String dni, String name, String email) {
         this.id = id;
         this.dni = dni;
         this.name = name;
         this.email = email;
-        this.password = password;
     }
 
     public int getId() {
@@ -46,13 +38,5 @@ public class User {
 
     public void setDni(String dni) {
         this.dni = dni;
-    }
-
-    public String getPassword() {
-        return password;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
     }
 }

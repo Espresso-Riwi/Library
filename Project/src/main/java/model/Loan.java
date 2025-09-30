@@ -7,17 +7,25 @@ public class Loan {
     private LocalDate loanDate;
     private LocalDate returnDate;
     private boolean returned;
+    private LocalDate dateOfReturn;
 
-    public Loan(int id, int userId, int itemId, LocalDate loanDate, LocalDate returnDate, boolean returned) {
+    public Loan(int id, int userId, int itemId, LocalDate loanDate, LocalDate returnDate, boolean returned, LocalDate dateOfReturn) {
         setId(id);
         setUserId(userId);
         setItemId(itemId);
         setLoanDate(loanDate);
         setReturnDate(returnDate);
         setReturned(returned);
+        setDateOfReturn(dateOfReturn);
     }
 
-    // Getters & Setters
+    public Loan(int userId, int itemId, LocalDate loanDate, LocalDate dateOfReturn) {
+        setUserId(userId);
+        setItemId(itemId);
+        setLoanDate(loanDate);
+        setDateOfReturn(dateOfReturn);
+    }
+
     public int getId() { return id; }
     public int getUserId() { return userId; }
     public int getItemId() { return itemId; }
@@ -32,15 +40,17 @@ public class Loan {
     public void setReturnDate(LocalDate returnDate) { this.returnDate = returnDate; }
     public void setReturned(boolean returned) { this.returned = returned; }
 
+    public LocalDate getDateOfReturn() {
+        return dateOfReturn;
+    }
+
+    public void setDateOfReturn(LocalDate dateOfReturn) {
+        this.dateOfReturn = dateOfReturn;
+    }
+
     @Override
     public String toString() {
-        return "Loan{" +
-                "id=" + id +
-                ", userId=" + userId +
-                ", itemId=" + itemId +
-                ", loanDate=" + loanDate +
-                ", returnDate=" + (returnDate != null ? returnDate.toString() : "null") +
-                ", returned=" + returned +
-                '}';
+        return "ID: "+id+"\nUserId: "+userId+"\nItemId: "+itemId+"\nLoan Date: "+loanDate+"\nReturn Date: "+returnDate+"\nReturned: "+returned;
+
     }
 }

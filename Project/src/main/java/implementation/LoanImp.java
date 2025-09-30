@@ -7,22 +7,23 @@ public class LoanImp implements LoanDAO {
 
     @Override
     public void addLoan(Loan loan) {
-        String sql = "INSERT INTO loan (id, user_id, item_id, loan_date, return_date, returned) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO loan (user_id, item_id, loan_date, date_of_return) VALUES (?, ?, ?, ?)";
+        String sqlItem = "UPDATE item SET available = false WHERE id= ?";
         try (Connection conn = DBConnection.getConnection();
-             PreparedStatement stmt = conn.prepareStatement(sql)) {
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             PreparedStatement stmtItem = conn.prepareStatement(sqlItem)) {
 
-            stmt.setInt(1, loan.getId());
-            stmt.setInt(2, loan.getUserId());
-            stmt.setInt(3, loan.getItemId());
-            stmt.setDate(4, Date.valueOf(loan.getLoanDate()));
-            if (loan.getReturnDate() != null) {
-                stmt.setDate(5, Date.valueOf(loan.getReturnDate()));
-            } else {
-                stmt.setNull(5, Types.DATE);
-            }
-            stmt.setBoolean(6, loan.isReturned());
+            stmt.setInt(1, loan.getUserId());
+            stmt.setInt(2, loan.getItemId());
+            stmt.setDate(3, Date.valueOf(loan.getLoanDate()));
+            stmt.setDate(4, Date.valueOf(loan.getDateOfReturn()));
+
 
             stmt.executeUpdate();
+
+            stmtItem.setInt(1, loan.getItemId());
+            stmtItem.executeUpdate();
+
         } catch (SQLException e) {
             e.printStackTrace();
         }
@@ -38,7 +39,6 @@ public class LoanImp implements LoanDAO {
             ResultSet rs = stmt.executeQuery();
 
             if (rs.next()) {
-                return mapResultSetToLoan(rs);
             }
 
         } catch (SQLException e) {
@@ -56,8 +56,16 @@ public class LoanImp implements LoanDAO {
              ResultSet rs = stmt.executeQuery(sql)) {
 
             while (rs.next()) {
-                loans.add(mapResultSetToLoan(rs));
-            }
+                loans.add(new Loan(
+                        rs.getInt("id"),
+                        rs.getInt("userId"),
+                        rs.getInt("itemId"),
+                        rs.getDate("loanDate").toLocalDate(),
+                        rs.getDate("returnDate").toLocalDate(),
+                        rs.getBoolean("returned"),
+                        rs.getDate("dateOfReturn").toLocalDate()
+                ));
+            };
 
         } catch (SQLException e) {
             e.printStackTrace();
@@ -105,7 +113,7 @@ public class LoanImp implements LoanDAO {
 
     @Override
     public void markAsReturned(int id) {
-        String sql = "UPDATE loan SET returned = TRUE, return_date = ? WHERE id=?";
+        String sql = "UPDATE loan SET returned = true, return_date = ? WHERE id= ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
@@ -116,17 +124,5 @@ public class LoanImp implements LoanDAO {
         } catch (SQLException e) {
             e.printStackTrace();
         }
-    }
-
-    private Loan mapResultSetToLoan(ResultSet rs) throws SQLException {
-        int id = rs.getInt("id");
-        int userId = rs.getInt("user_id");
-        int itemId = rs.getInt("item_id");
-        LocalDate loanDate = rs.getDate("loan_date").toLocalDate();
-        Date returnDateSql = rs.getDate("return_date");
-        LocalDate returnDate = (returnDateSql != null) ? returnDateSql.toLocalDate() : null;
-        boolean returned = rs.getBoolean("returned");
-
-        return new Loan(id, userId, itemId, loanDate, returnDate, returned);
     }
 }

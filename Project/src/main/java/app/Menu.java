@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.time.LocalDate;
 import java.util.List;
 
 public class Menu {
@@ -70,13 +71,37 @@ public class Menu {
                     break;
 
                 case "Loans":
-                    String[] loansOptions = {"Show all loans"};
-                    option = JOptionPane.showInputDialog(null, "Item Options", "Item Menu", JOptionPane.INFORMATION_MESSAGE, null, loansOptions, loansOptions[0]).toString();
+                    String[] loansOptions = {"Show all loans", "Loan", "Return"};
+                    option = JOptionPane.showInputDialog(null, "Loans Options", "Loan Menu", JOptionPane.INFORMATION_MESSAGE, null, loansOptions, loansOptions[0]).toString();
 
                     switch (option){
                         case "Show all loans":
                             break;
                         case "Loan":
+                            String[] loanType = {"Book", "Magazine", "Exit"};
+                            option = JOptionPane.showInputDialog(null, "Loans Options", "Loan Menu", JOptionPane.INFORMATION_MESSAGE, null, loanType, loanType[0]).toString();
+                            switch (option){
+                                case "Book":
+                                    bookLoan();
+                                    break;
+                                case "Magazine":
+                                    break;
+                                case "Exit":
+                                    break;
+                            }
+                            break;
+                        case "Return":
+                            String[] returnType = {"Book", "Magazine", "Exit"};
+                            option = JOptionPane.showInputDialog(null, "Loans Options", "Loan Menu", JOptionPane.INFORMATION_MESSAGE, null, returnType, returnType[0]).toString();
+                            switch (option){
+                                case "Book":
+                                    returnBook();
+                                    break;
+                                case "Magazine":
+                                    break;
+                                case "Exit":
+                                    break;
+                            }
                             break;
                         default:
                             break;
@@ -129,6 +154,18 @@ public class Menu {
         JOptionPane.showMessageDialog(null, magazines, "Magazines", JOptionPane.INFORMATION_MESSAGE);
     }
 
+    public void showAllLoans(){
+        LoanImp loanImp = new LoanImp();
+        List<Loan> loanList = loanImp.getAllLoans();
+
+        String loans = "";
+        for (Loan l : loanList){
+            loans += l.toString()+"\n\n";
+        }
+
+        JOptionPane.showMessageDialog(null, loans, "Magazines", JOptionPane.INFORMATION_MESSAGE);
+    }
+
     public Book addBook(){
         String title = JOptionPane.showInputDialog(null, "Title: ", "Title", JOptionPane.QUESTION_MESSAGE);
         String author = JOptionPane.showInputDialog(null, "Author: ", "Author", JOptionPane.QUESTION_MESSAGE);
@@ -154,7 +191,6 @@ public class Menu {
             case "Title":
                 String title = JOptionPane.showInputDialog(null, "Enter a new title", book.getTitle());
                 book.setTitle(title);
-                System.out.println(book.getTitle());
                 break;
             case "Author":
                 book.setAuthor(JOptionPane.showInputDialog(null, "Enter a new author", book.getAuthor()));
@@ -216,5 +252,27 @@ public class Menu {
 
         MagazineImp magazineImp = new MagazineImp();
         magazineImp.updateMagazine(magazine);
+    }
+
+
+    //It works, just do the logic to recognize the book and the user.
+    public void bookLoan(){
+        Loan loan = new Loan(1, 1, LocalDate.now(), LocalDate.now().plusDays(10));
+        LoanImp loanImp = new LoanImp();
+
+        loanImp.addLoan(loan);
+    }
+
+    public void MagazineLoan(){
+        Loan loan = new Loan(1, 1, LocalDate.now(), LocalDate.now().plusDays(10));
+        LoanImp loanImp = new LoanImp();
+
+        loanImp.addLoan(loan);
+    }
+
+    //It works, just do the logic to recognize the book and the user.
+    public void returnBook(){
+        LoanImp loanImp = new LoanImp();
+        loanImp.markAsReturned(1);
     }
 }
