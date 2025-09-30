@@ -254,17 +254,28 @@ public class Menu {
         magazineImp.updateMagazine(magazine);
     }
 
+    public User getUserByDni(){
+        String dni = JOptionPane.showInputDialog(null, "User DNI: ", "User Info", JOptionPane.QUESTION_MESSAGE);
+        UsersTestImp usersTestImp = new UsersTestImp();
+        return usersTestImp.getUserByDni(dni);
+    }
 
     //It works, just do the logic to recognize the book and the user.
     public void bookLoan(){
-        Loan loan = new Loan(1, 1, LocalDate.now(), LocalDate.now().plusDays(10));
+        Book book = getBookByName();
+        User user = getUserByDni();
+
+        Loan loan = new Loan(user.getId(), book.getId(), LocalDate.now(), LocalDate.now().plusDays(10));
         LoanImp loanImp = new LoanImp();
 
         loanImp.addLoan(loan);
     }
 
     public void MagazineLoan(){
-        Loan loan = new Loan(1, 1, LocalDate.now(), LocalDate.now().plusDays(10));
+        Magazine magazine = getMagazineByName();
+        User user = getUserByDni();
+
+        Loan loan = new Loan(user.getId(), magazine.getId(), LocalDate.now(), LocalDate.now().plusDays(10));
         LoanImp loanImp = new LoanImp();
 
         loanImp.addLoan(loan);
@@ -272,6 +283,8 @@ public class Menu {
 
     //It works, just do the logic to recognize the book and the user.
     public void returnBook(){
+        User user = getUserByDni();
+
         LoanImp loanImp = new LoanImp();
         loanImp.markAsReturned(1);
     }

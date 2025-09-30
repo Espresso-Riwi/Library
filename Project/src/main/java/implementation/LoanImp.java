@@ -112,6 +112,25 @@ public class LoanImp implements LoanDAO {
     }
 
     @Override
+    public void userLoans(User user) {
+        String sql = "SELECT i.title, i.author, l.user_id, i.type from loan l\n" +
+                "    JOIN userTest u ON l.user_id = u.id\n" +
+                "    JOIN item i ON l.item_id = i.id\n" +
+                "    where u.id = ?;";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setInt(1, user.getId());
+            stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+    }
+
+
+
+    @Override
     public void markAsReturned(int id) {
         String sql = "UPDATE loan SET returned = true, return_date = ? WHERE id= ?";
         try (Connection conn = DBConnection.getConnection();
