@@ -2,6 +2,13 @@ public class Book extends Item {
     private String isbn;
     private String editorial;
 
+    public Book(String title, String author, String isbn, String editorial) {
+        super(title, author, true, "BOOK");
+        setIsbn(isbn);
+        setEditorial(editorial);
+
+    }
+
     public Book(int id, String title, String author, boolean available, String isbn, String editorial) {
         super(id, title, author, available, "BOOK");
         setIsbn(isbn);
@@ -27,13 +34,6 @@ public class Book extends Item {
 
     @Override
     public String toString() {
-        return "Book{" +
-                "id=" + id +
-                ", title='" + title + '\'' +
-                ", author='" + author + '\'' +
-                ", available=" + available +
-                ", type='" + type + '\'' +
-                ", isbn='" + isbn + '\'' +
-                '}';
+        return "ID: "+id+"\nTitle: "+title+"\nAuthor: "+author+"\nAvailable: "+available+"\nISBN: "+isbn+"\nEditorial: "+editorial;
     }
 }

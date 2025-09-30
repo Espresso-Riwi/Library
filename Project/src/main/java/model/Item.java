@@ -13,6 +13,13 @@ public abstract class Item {
         setType(type);
     }
 
+    public Item(String title, String author, boolean available, String type) {
+        setTitle(title);
+        setAuthor(author);
+        setAvailable(available);
+        setType(type);
+    }
+
     public int getId() { return id; }
     public String getTitle() { return title; }
     public String getAuthor() { return author; }
@@ -24,4 +31,9 @@ public abstract class Item {
     public void setAuthor(String author) { this.author = author; }
     public void setAvailable(boolean available) { this.available = available; }
     public void setType(String type) { this.type = type; }
+
+    @Override
+    public String toString() {
+        return "ID: "+id+"\nTitle: "+title+"\nAuthor: "+author+"\nAvailable: "+available+"\nType: "+type;
+    }
 }

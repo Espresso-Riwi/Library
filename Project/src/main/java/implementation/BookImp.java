@@ -6,25 +6,32 @@ public class BookImp implements BookDAO {
 
     @Override
     public void addBook(Book book) {
-        String sqlItem = "INSERT INTO item (id, title, author, available, type) VALUES (?, ?, ?, ?, ?)";
-        String sqlBook = "INSERT INTO book (id, isbn, editorial) VALUES (?, ?, ?)";
+        String sqlItem = "INSERT INTO item (title, author, type) VALUES (?, ?, ?)";
+        String sqlBook = "INSERT INTO book (isbn, editorial, id) VALUES (?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
 
-            try (PreparedStatement stmtItem = conn.prepareStatement(sqlItem);
+            try (PreparedStatement stmtItem = conn.prepareStatement(sqlItem, Statement.RETURN_GENERATED_KEYS);
                  PreparedStatement stmtBook = conn.prepareStatement(sqlBook)) {
 
-                stmtItem.setInt(1, book.getId());
-                stmtItem.setString(2, book.getTitle());
-                stmtItem.setString(3, book.getAuthor());
-                stmtItem.setBoolean(4, book.isAvailable());
-                stmtItem.setString(5, "BOOK");
+                stmtItem.setString(1, book.getTitle());
+                stmtItem.setString(2, book.getAuthor());
+                stmtItem.setString(3, "BOOK");
+
                 stmtItem.executeUpdate();
 
-                stmtBook.setInt(1, book.getId());
-                stmtBook.setString(2, book.getIsbn());
-                stmtBook.setString(3, book.getEditorial());
+                ResultSet rs = null;
+                rs = stmtItem.getGeneratedKeys();
+
+                int id = 0;
+                if (rs.next()) {
+                    id = rs.getInt(1);
+                }
+
+                stmtBook.setString(1, book.getIsbn());
+                stmtBook.setString(2, book.getEditorial());
+                stmtBook.setInt(3, id);
                 stmtBook.executeUpdate();
 
                 conn.commit();
@@ -40,7 +47,7 @@ public class BookImp implements BookDAO {
     @Override
     public Book getBookById(int id) {
         String sql = "SELECT i.id, i.title, i.author, i.available, b.isbn, i.editorial" +
-                "FROM item i JOIN book b ON i.id = b.id WHERE i.id = ? AND i.type = 'BOOK'";
+                "FROM item i JOIN book b ON i.id = b.id WHERE i.id = ? AND i.type = 'BOOK' AND i.available = true";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -65,10 +72,39 @@ public class BookImp implements BookDAO {
     }
 
     @Override
+    public Book getBookByName(String name) {
+        String sql = "SELECT i.id, i.title, i.author, i.available, b.isbn, b.editorial FROM item i JOIN book b ON i.id = b.id WHERE i.title = ? AND i.type = 'BOOK' AND i.available = true";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, name);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new Book(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getString("author"),
+                        rs.getBoolean("available"),
+                        rs.getString("isbn"),
+                        rs.getString("editorial")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
     public List<Book> getAllBooks() {
         List<Book> books = new ArrayList<>();
-        String sql = "SELECT i.id, i.title, i.author, i.available, b.isbn, i.editorial" +
-                "FROM item i JOIN book b ON i.id = b.id WHERE i.type = 'BOOK'";
+        String sql = """
+                SELECT i.id, i.title, i.author, i.available, b.isbn, b.editorial
+                FROM item i\s
+                JOIN book b ON i.id = b.id\s
+                WHERE i.type = 'BOOK';""";
 
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
@@ -92,8 +128,8 @@ public class BookImp implements BookDAO {
 
     @Override
     public void updateBook(Book book) {
-        String sqlItem = "UPDATE item SET title = ?, author = ?, available = ?, type = ? WHERE id = ?";
-        String sqlBook = "UPDATE book SET isbn = ?, SET editorial = ?, WHERE id = ?";
+        String sqlItem = "UPDATE item SET title = ?, author = ? WHERE id = ?";
+        String sqlBook = "UPDATE book SET isbn = ?, editorial = ? WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -103,13 +139,11 @@ public class BookImp implements BookDAO {
 
                 stmtItem.setString(1, book.getTitle());
                 stmtItem.setString(2, book.getAuthor());
-                stmtItem.setBoolean(3, book.isAvailable());
-                stmtItem.setString(4, "BOOK");
-                stmtItem.setInt(5, book.getId());
+                stmtItem.setInt(3, book.getId());
                 stmtItem.executeUpdate();
 
                 stmtBook.setString(1, book.getIsbn());
-                stmtBook.setString(1, book.getEditorial());
+                stmtBook.setString(2, book.getEditorial());
                 stmtBook.setInt(3, book.getId());
                 stmtBook.executeUpdate();
 

@@ -6,23 +6,30 @@ public class MagazineImp implements MagazineDAO {
 
     @Override
     public void addMagazine(Magazine magazine) {
-        String sqlItem = "INSERT INTO item (id, title, author, available, type) VALUES (?, ?, ?, ?, ?, ?)";
-        String sqlMagazine = "INSERT INTO magazine (id, issueNumber, topic) VALUES (?, ?, ?)";
+        String sqlItem = "INSERT INTO item (title, author, type) VALUES (?, ?, ?)";
+        String sqlMagazine = "INSERT INTO magazine (id, issue_number, topic) VALUES (?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
 
-            try (PreparedStatement stmtItem = conn.prepareStatement(sqlItem);
+            try (PreparedStatement stmtItem = conn.prepareStatement(sqlItem, Statement.RETURN_GENERATED_KEYS);
                  PreparedStatement stmtMagazine = conn.prepareStatement(sqlMagazine)) {
 
-                stmtItem.setInt(1, magazine.getId());
-                stmtItem.setString(2, magazine.getTitle());
-                stmtItem.setString(3, magazine.getAuthor());
-                stmtItem.setBoolean(4, magazine.isAvailable());
-                stmtItem.setString(5, "MAGAZINE");
+                stmtItem.setString(1, magazine.getTitle());
+                stmtItem.setString(2, magazine.getAuthor());
+                stmtItem.setString(3, "MAGAZINE");
+
                 stmtItem.executeUpdate();
 
-                stmtMagazine.setInt(1, magazine.getId());
+                ResultSet rs = null;
+                rs = stmtItem.getGeneratedKeys();
+
+                int id = 0;
+                if (rs.next()) {
+                    id = rs.getInt(1);
+                }
+
+                stmtMagazine.setInt(1, id);
                 stmtMagazine.setInt(2, magazine.getIssueNumber());
                 stmtMagazine.setString(3, magazine.getTopic());
                 stmtMagazine.executeUpdate();
@@ -39,8 +46,8 @@ public class MagazineImp implements MagazineDAO {
 
     @Override
     public Magazine getMagazineById(int id) {
-        String sql = "SELECT i.id, i.title, i.author, i.year, i.available, m.issueNumber, m.topic " +
-                "FROM item i JOIN magazine m ON i.id = m.id WHERE i.id = ? AND i.type = 'MAGAZINE'";
+        String sql = "SELECT i.id, i.title, i.author, i.year, i.available, m.issue_number, m.topic " +
+                "FROM item i JOIN magazine m ON i.id = m.id WHERE i.id = ? AND i.type = 'MAGAZINE' AND i.available = true";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
@@ -54,7 +61,34 @@ public class MagazineImp implements MagazineDAO {
                         rs.getString("title"),
                         rs.getString("author"),
                         rs.getBoolean("available"),
-                        rs.getInt("issueNumber"),
+                        rs.getInt("issue_number"),
+                        rs.getString("topic")
+                );
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    @Override
+    public Magazine getMagazineByName(String name) {
+        String sql = "SELECT i.id, i.title, i.author, i.available, m.issue_number, m.topic " +
+                "FROM item i JOIN magazine m ON i.id = m.id WHERE i.title = ? AND i.type = 'MAGAZINE' AND i.available = true";
+
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql)) {
+
+            stmt.setString(1, name);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new Magazine(
+                        rs.getInt("id"),
+                        rs.getString("title"),
+                        rs.getString("author"),
+                        rs.getBoolean("available"),
+                        rs.getInt("issue_number"),
                         rs.getString("topic")
                 );
             }
@@ -67,8 +101,7 @@ public class MagazineImp implements MagazineDAO {
     @Override
     public List<Magazine> getAllMagazines() {
         List<Magazine> magazines = new ArrayList<>();
-        String sql = "SELECT i.id, i.title, i.author, i.available, m.issueNumber, m.topic " +
-                "FROM item i JOIN magazine m ON i.id = m.id WHERE i.type = 'MAGAZINE'";
+        String sql = "SELECT i.id, i.title, i.author, i.available, m.issue_number, m.topic FROM item i JOIN magazine m ON i.id = m.id WHERE i.type = 'MAGAZINE'";
 
         try (Connection conn = DBConnection.getConnection();
              Statement stmt = conn.createStatement();
@@ -80,7 +113,7 @@ public class MagazineImp implements MagazineDAO {
                         rs.getString("title"),
                         rs.getString("author"),
                         rs.getBoolean("available"),
-                        rs.getInt("issueNumber"),
+                        rs.getInt("issue_number"),
                         rs.getString("topic")
                 ));
             }
@@ -92,8 +125,8 @@ public class MagazineImp implements MagazineDAO {
 
     @Override
     public void updateMagazine(Magazine magazine) {
-        String sqlItem = "UPDATE item SET title = ?, author = ?, available = ?, type = ? WHERE id = ?";
-        String sqlMagazine = "UPDATE magazine SET issueNumber = ?, topic = ? WHERE id = ?";
+        String sqlItem = "UPDATE item SET title = ?, author = ? WHERE id = ?";
+        String sqlMagazine = "UPDATE magazine SET issue_number = ?, topic = ? WHERE id = ?";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -103,9 +136,7 @@ public class MagazineImp implements MagazineDAO {
 
                 stmtItem.setString(1, magazine.getTitle());
                 stmtItem.setString(2, magazine.getAuthor());
-                stmtItem.setBoolean(3, magazine.isAvailable());
-                stmtItem.setString(4, "MAGAZINE");
-                stmtItem.setInt(5, magazine.getId());
+                stmtItem.setInt(3, magazine.getId());
                 stmtItem.executeUpdate();
 
                 stmtMagazine.setInt(1, magazine.getIssueNumber());
