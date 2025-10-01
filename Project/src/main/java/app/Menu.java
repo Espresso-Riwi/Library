@@ -21,7 +21,7 @@ public class Menu {
                             showAllBooks();
                             break;
                         case "Search book by name":
-                            getBookByName();
+                            showBookInfo();
                             break;
                         case "Add book":
                             BookImp bookImp = new BookImp();
@@ -44,6 +44,7 @@ public class Menu {
                             showAllMagazines();
                             break;
                         case "Search magazine by name":
+                            showMagazineInfo();
                             break;
                         case "Add magazine":
                             MagazineImp magazineImp = new MagazineImp();
@@ -61,21 +62,18 @@ public class Menu {
                     String[] itemsOptions = {"Show all items"};
                     option = JOptionPane.showInputDialog(null, "Item Options", "Item Menu", JOptionPane.INFORMATION_MESSAGE, null, itemsOptions, itemsOptions[0]).toString();
 
-                    switch (option){
-                        case "Show all items":
-                            showAllItems();
-                            break;
-                        default:
-                            break;
+                    if (option.equals("Show all items")) {
+                        showAllItems();
                     }
                     break;
 
                 case "Loans":
-                    String[] loansOptions = {"Show all loans", "Loan", "Return"};
+                    String[] loansOptions = {"Show all loans", "Loan", "Return", "User loans"};
                     option = JOptionPane.showInputDialog(null, "Loans Options", "Loan Menu", JOptionPane.INFORMATION_MESSAGE, null, loansOptions, loansOptions[0]).toString();
 
                     switch (option){
                         case "Show all loans":
+                            showAllLoans();
                             break;
                         case "Loan":
                             String[] loanType = {"Book", "Magazine", "Exit"};
@@ -85,6 +83,7 @@ public class Menu {
                                     bookLoan();
                                     break;
                                 case "Magazine":
+                                    magazineLoan();
                                     break;
                                 case "Exit":
                                     break;
@@ -98,10 +97,14 @@ public class Menu {
                                     returnBook();
                                     break;
                                 case "Magazine":
+                                    returnMagazine();
                                     break;
                                 case "Exit":
                                     break;
                             }
+                            break;
+                        case "User loans":
+                            userLoans();
                             break;
                         default:
                             break;
@@ -163,7 +166,7 @@ public class Menu {
             loans += l.toString()+"\n\n";
         }
 
-        JOptionPane.showMessageDialog(null, loans, "Magazines", JOptionPane.INFORMATION_MESSAGE);
+        JOptionPane.showMessageDialog(null, loans, "All loans", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public Book addBook(){
@@ -179,6 +182,18 @@ public class Menu {
         String name = JOptionPane.showInputDialog(null, "Book name: ", "Title", JOptionPane.QUESTION_MESSAGE);
         BookImp bookImp = new BookImp();
         return bookImp.getBookByName(name);
+    }
+
+    public void showBookInfo(){
+        Book book = getBookByName();
+
+        JOptionPane.showMessageDialog(null, book.toString(), "Book", JOptionPane.INFORMATION_MESSAGE);
+    }
+
+    public void showMagazineInfo(){
+        Magazine magazine = getMagazineByName();
+
+        JOptionPane.showMessageDialog(null, magazine.toString(), "Magazine", JOptionPane.INFORMATION_MESSAGE);
     }
 
     public void updateBook(){
@@ -220,7 +235,7 @@ public class Menu {
     }
 
     public Magazine getMagazineByName(){
-        String name = JOptionPane.showInputDialog(null, "Book name: ", "Title", JOptionPane.QUESTION_MESSAGE);
+        String name = JOptionPane.showInputDialog(null, "Magazine name: ", "Title", JOptionPane.QUESTION_MESSAGE);
         MagazineImp magazineImp = new MagazineImp();
 
         return magazineImp.getMagazineByName(name);
@@ -260,7 +275,6 @@ public class Menu {
         return usersTestImp.getUserByDni(dni);
     }
 
-    //It works, just do the logic to recognize the book and the user.
     public void bookLoan(){
         Book book = getBookByName();
         User user = getUserByDni();
@@ -271,7 +285,7 @@ public class Menu {
         loanImp.addLoan(loan);
     }
 
-    public void MagazineLoan(){
+    public void magazineLoan(){
         Magazine magazine = getMagazineByName();
         User user = getUserByDni();
 
@@ -281,11 +295,35 @@ public class Menu {
         loanImp.addLoan(loan);
     }
 
-    //It works, just do the logic to recognize the book and the user.
     public void returnBook(){
+        User user = getUserByDni();
+        Book book = getBookByName();
+
+        LoanImp loanImp = new LoanImp();
+        LoanInfo loanInfo =  loanImp.getLoanByItemAndUserId(user, book.getTitle(), "BOOK");
+        loanImp.markAsReturned(loanInfo.getLoanId());
+    }
+
+    public void returnMagazine(){
+        User user = getUserByDni();
+        Magazine magazine = getMagazineByName();
+
+        LoanImp loanImp = new LoanImp();
+        LoanInfo loanInfo =  loanImp.getLoanByItemAndUserId(user, magazine.getTitle(), "MAGAZINE");
+        loanImp.markAsReturned(loanInfo.getLoanId());
+    }
+
+    public void userLoans(){
         User user = getUserByDni();
 
         LoanImp loanImp = new LoanImp();
-        loanImp.markAsReturned(1);
+        List<LoanInfo> loanInfoList = loanImp.userLoans(user);
+
+        String userLoans = "";
+        for (LoanInfo loanInfo : loanInfoList){
+            userLoans += loanInfo.toString()+"\n\n";
+        }
+
+        JOptionPane.showMessageDialog(null, userLoans, "Loan Info", JOptionPane.INFORMATION_MESSAGE);
     }
 }

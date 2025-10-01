@@ -37,7 +37,11 @@ public class Loan {
     public void setUserId(int userId) { this.userId = userId; }
     public void setItemId(int itemId) { this.itemId = itemId; }
     public void setLoanDate(LocalDate loanDate) { this.loanDate = loanDate; }
-    public void setReturnDate(LocalDate returnDate) { this.returnDate = returnDate; }
+
+    public void setReturnDate(LocalDate returnDate) {
+        this.returnDate = returnDate;
+
+    }
     public void setReturned(boolean returned) { this.returned = returned; }
 
     public LocalDate getDateOfReturn() {

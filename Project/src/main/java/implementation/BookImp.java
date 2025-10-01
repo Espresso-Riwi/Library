@@ -73,7 +73,7 @@ public class BookImp implements BookDAO {
 
     @Override
     public Book getBookByName(String name) {
-        String sql = "SELECT i.id, i.title, i.author, i.available, b.isbn, b.editorial FROM item i JOIN book b ON i.id = b.id WHERE i.title = ? AND i.type = 'BOOK' AND i.available = true";
+        String sql = "SELECT i.id, i.title, i.author, i.available, b.isbn, b.editorial FROM item i JOIN book b ON i.id = b.id WHERE i.title = ? AND i.type = 'BOOK'";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

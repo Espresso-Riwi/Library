@@ -4,7 +4,7 @@ public class UsersTestImp implements  UserTestDAO{
 
     @Override
     public void addUser(User user) {
-        String sqlUser = "INSERT INTO user (name, email, dni) VALUES (?, ?, ?)";
+        String sqlUser = "INSERT INTO userTest (name, email, dni) VALUES (?, ?, ?)";
 
         try (Connection conn = DBConnection.getConnection()) {
             conn.setAutoCommit(false);
@@ -27,7 +27,7 @@ public class UsersTestImp implements  UserTestDAO{
 
     @Override
     public User getUserByDni(String dni) {
-        String sql = "SELECT * FROM user where dni = ?";
+        String sql = "SELECT * FROM userTest where dni = ?";
 
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {

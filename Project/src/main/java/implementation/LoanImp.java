@@ -58,12 +58,12 @@ public class LoanImp implements LoanDAO {
             while (rs.next()) {
                 loans.add(new Loan(
                         rs.getInt("id"),
-                        rs.getInt("userId"),
-                        rs.getInt("itemId"),
-                        rs.getDate("loanDate").toLocalDate(),
-                        rs.getDate("returnDate").toLocalDate(),
+                        rs.getInt("user_id"),
+                        rs.getInt("item_id"),
+                        rs.getDate("loan_date").toLocalDate(),
+                        rs.getDate("return_date") != null ? rs.getDate("return_date").toLocalDate() : null,
                         rs.getBoolean("returned"),
-                        rs.getDate("dateOfReturn").toLocalDate()
+                        rs.getDate("date_of_return").toLocalDate()
                 ));
             };
 
@@ -112,36 +112,83 @@ public class LoanImp implements LoanDAO {
     }
 
     @Override
-    public void userLoans(User user) {
+    public List<LoanInfo> userLoans(User user) {
+        List<LoanInfo> loanInfoList = new ArrayList<>();
         String sql = "SELECT i.title, i.author, l.user_id, i.type from loan l\n" +
                 "    JOIN userTest u ON l.user_id = u.id\n" +
                 "    JOIN item i ON l.item_id = i.id\n" +
-                "    where u.id = ?;";
+                "    where u.id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
             stmt.setInt(1, user.getId());
+            ResultSet rs = stmt.executeQuery();
+
+            while (rs.next()) {
+                loanInfoList.add(new LoanInfo(
+                        rs.getString("title"),
+                        rs.getString("author"),
+                        rs.getInt("user_id"),
+                        rs.getString("type")
+                ));
+            }
+
+        } catch (SQLException e) {
+            e.printStackTrace();
+        }
+        return loanInfoList;
+    }
+
+    @Override
+    public void markAsReturned(int id) {
+        String sql = "UPDATE loan SET returned = true, return_date = ? WHERE id= ?";
+        String sqlItem = "UPDATE item set available = true";
+        try (Connection conn = DBConnection.getConnection();
+             PreparedStatement stmt = conn.prepareStatement(sql);
+             Statement statement = conn.createStatement()) {
+
+            stmt.setDate(1, Date.valueOf(LocalDate.now()));
+            stmt.setInt(2, id);
             stmt.executeUpdate();
+            statement.executeUpdate(sqlItem);
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
     }
 
-
-
     @Override
-    public void markAsReturned(int id) {
-        String sql = "UPDATE loan SET returned = true, return_date = ? WHERE id= ?";
+    public LoanInfo getLoanByItemAndUserId(User user, String title, String type) {
+        String sql = """
+                SELECT i.title, i.author, l.user_id, i.type, l.id
+                from loan l
+                JOIN userTest u ON l.user_id = u.id
+                JOIN item i ON l.item_id = i.id
+                where u.id = ? AND i.title = ? AND i.type = ?;
+               """;
+
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql)) {
 
-            stmt.setDate(1, Date.valueOf(LocalDate.now()));
-            stmt.setInt(2, id);
-            stmt.executeUpdate();
+            stmt.setInt(1, user.getId());
+            stmt.setString(2, title);
+            stmt.setString(3, type);
+            ResultSet rs = stmt.executeQuery();
+
+            if (rs.next()) {
+                return new LoanInfo(
+                        rs.getString("title"),
+                        rs.getString("author"),
+                        rs.getInt("user_id"),
+                        rs.getString("type"),
+                        rs.getInt("id")
+                );
+            }
 
         } catch (SQLException e) {
             e.printStackTrace();
         }
+
+        return null;
     }
 }
