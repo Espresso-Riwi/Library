@@ -140,16 +140,18 @@ public class LoanImp implements LoanDAO {
     }
 
     @Override
-    public void markAsReturned(int id) {
+    public void markAsReturned(int id, int item_id) {
         String sql = "UPDATE loan SET returned = true, return_date = ? WHERE id= ?";
-        String sqlItem = "UPDATE item set available = true";
+        String sqlItem = "UPDATE item set available = true where id = ?";
         try (Connection conn = DBConnection.getConnection();
              PreparedStatement stmt = conn.prepareStatement(sql);
-             Statement statement = conn.createStatement()) {
+             PreparedStatement statement = conn.prepareStatement(sqlItem)) {
 
             stmt.setDate(1, Date.valueOf(LocalDate.now()));
             stmt.setInt(2, id);
             stmt.executeUpdate();
+
+            statement.setInt(1, item_id);
             statement.executeUpdate(sqlItem);
 
         } catch (SQLException e) {

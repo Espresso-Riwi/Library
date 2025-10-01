@@ -7,6 +7,6 @@ public interface LoanDAO {
     void updateLoan(Loan loan);
     void deleteLoan(int id);
     List<LoanInfo> userLoans(User user);
-    void markAsReturned(int id);
+    void markAsReturned(int id, int item_id);
     LoanInfo getLoanByItemAndUserId(User user, String title, String type);
 }

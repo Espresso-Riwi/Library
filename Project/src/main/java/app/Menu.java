@@ -301,7 +301,7 @@ public class Menu {
 
         LoanImp loanImp = new LoanImp();
         LoanInfo loanInfo =  loanImp.getLoanByItemAndUserId(user, book.getTitle(), "BOOK");
-        loanImp.markAsReturned(loanInfo.getLoanId());
+        loanImp.markAsReturned(loanInfo.getLoanId(), book.getId());
     }
 
     public void returnMagazine(){
@@ -310,7 +310,7 @@ public class Menu {
 
         LoanImp loanImp = new LoanImp();
         LoanInfo loanInfo =  loanImp.getLoanByItemAndUserId(user, magazine.getTitle(), "MAGAZINE");
-        loanImp.markAsReturned(loanInfo.getLoanId());
+        loanImp.markAsReturned(loanInfo.getLoanId(), magazine.getId());
     }
 
     public void userLoans(){
